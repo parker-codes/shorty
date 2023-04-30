@@ -5,15 +5,15 @@ use chrono::{NaiveDateTime, Utc};
 use rocket::response::status;
 use rocket::response::Redirect;
 use rocket::serde::json::Json;
+use rocket::serde::uuid::Uuid;
 use rocket::State;
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
 use std::sync::Mutex;
-use uuid::Uuid;
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
+#[shuttle_runtime::main]
+async fn init() -> shuttle_rocket::ShuttleRocket {
+    let rocket = rocket::build()
         .mount(
             "/",
             routes![
@@ -25,7 +25,9 @@ fn rocket() -> _ {
                 list_entry_visits
             ],
         )
-        .manage(Store::new())
+        .manage(Store::new());
+
+    Ok(rocket.into())
 }
 
 #[get("/")]
